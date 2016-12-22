@@ -1,0 +1,10 @@
+.idea
+*.iml
+out
+target
+
+# osx file
+.DS_Store
+
+# ignore temp files
+*~
