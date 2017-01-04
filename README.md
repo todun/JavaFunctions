@@ -51,3 +51,8 @@ Sample Inputs									|	Sample Outputs
 {1, 2, 3, 4, 5, 6, 7}							|	{1, 2, 3, 4, 5, 6, 7}
 
 >>> note that order of the elements in the return array is not significant - so {5, 4} or {4, 5} is fine
+
+### References ###
+
+- Javadocs
+- Stackoverflow
