@@ -2,15 +2,16 @@ package com.todun.utils.requirement.four;
 
 import com.todun.exceptions.InvalidInputException;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Write a function that takes an array of integers, and returns an array of integers.
  * The return value should contain those integers which are most common in the input array.
  */
-public class RequirementFour {
+class RequirementFour {
 
     /**
      * Array of most common integers
@@ -19,90 +20,58 @@ public class RequirementFour {
      * @return array of most common integers
      * @throws InvalidInputException if array is null
      */
-    public static Integer[] mostCommonElements(Integer[] elements) throws InvalidInputException {
+    static Integer[] mostCommonElements(Integer[] elements) throws InvalidInputException {
         if (elements == null) throw new InvalidInputException();
 
-        HashMap<Integer, Integer> elementToFrequency = getElementToFrequency(elements);
+        if (elements.length == 0) return new Integer[]{};
 
-        HashMap<Integer, HashSet<Integer>> frequencyToElements = getElementsWithSameFrequencyValues(elements, elementToFrequency);
 
-        return getMostCommonElements(frequencyToElements);
+        Map<Integer, Long> occurrences = arrayToMapOfArrayElementOccurrenceFrequency(elements);
+
+        Long maxOccurrence = getMaxOccurrence(occurrences);
+
+        List listOfMax = listMostCommonElements(occurrences, maxOccurrence);
+
+        return (Integer[]) listOfMax.toArray(new Integer[listOfMax.size()]);
     }
 
     /**
-     * Helper method for {@link #mostCommonElements(Integer[])}.
-     * Gets the most common elements in a given map.
-     * <p>
-     * if map is not empty, return value of maximum key
-     * else return empty array
+     * Generates a distinct list of elements that are repeated the most
      *
-     * @param frequencyToElements number of occurences of element in input
-     * @return array of most common integers
+     * @param occurrences   map of element to the number of times it repeats
+     * @param maxOccurrence maximum number of times an element is repeated
+     * @return list of most common elements
      */
-    private static Integer[] getMostCommonElements(HashMap<Integer, HashSet<Integer>> frequencyToElements) {
-        int mapSize = frequencyToElements.size();
-        if (mapSize > 0) {
-            int maxKey = Collections.max(frequencyToElements.keySet());
-
-            HashSet<Integer> mostCommonUniqueElements = frequencyToElements.get(maxKey);
-            Integer[] mostCommonElementsArray = mostCommonUniqueElements.toArray(new Integer[mostCommonUniqueElements.size()]);
-            return mostCommonElementsArray;
-        } else {
-            return new Integer[]{};
-        }
+    private static List listMostCommonElements(Map<Integer, Long> occurrences, Long maxOccurrence) {
+        return occurrences
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(maxOccurrence))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Helper method for {@link #mostCommonElements(Integer[])}. Build frequency's to elements map
+     * Determines the maximum number of occurrence
      *
-     * @param elements           input array
-     * @param elementToFrequency map of element to its frequency
-     * @return map of frequency to elements that have the same frequency
+     * @param occurrences map of element to the number of times it repeats
+     * @return maximum number of occurrence of an element
      */
-    private static HashMap<Integer, HashSet<Integer>> getElementsWithSameFrequencyValues(Integer[] elements, HashMap<Integer, Integer> elementToFrequency) {
-        HashMap<Integer, HashSet<Integer>> frequencyToElements = new HashMap();
-        HashSet<Integer> elementsWithSameFrequencyValues = new HashSet();
-        for (Integer element : elements) {
-            Integer frequencyKey = elementToFrequency.get(element); // frequency value of the input element
-
-            // reset the values collection of most common elements
-            if (frequencyToElements.get(frequencyKey) == null) {
-                elementsWithSameFrequencyValues = new HashSet();
-                frequencyToElements.put(frequencyKey, elementsWithSameFrequencyValues);
-            }
-
-            // update the values collection of most common elements
-            if (frequencyToElements.get(frequencyKey) != null) {
-                elementsWithSameFrequencyValues = frequencyToElements.get(frequencyKey);
-                // update value list
-                elementsWithSameFrequencyValues.add(element);
-                // update map with kye,value pair
-                frequencyToElements.put(frequencyKey, elementsWithSameFrequencyValues);
-            }
-        }
-        return frequencyToElements;
+    private static Long getMaxOccurrence(Map<Integer, Long> occurrences) {
+        return occurrences.entrySet()
+                .stream()
+                .max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1)
+                .get()
+                .getValue();
     }
 
     /**
-     * Helper method to {@link #mostCommonElements(Integer[])}.
-     * Map of each element to its frequency of occurence in the integer array
+     * Convert an array of elements into a map of its elements as keys to frequency of occurrence as values
      *
-     * @param elements integer array
-     * @return frequency of occurence of each element in integer input array
+     * @param elements array of elements
+     * @return map of array element to frequency of occurrence
      */
-    private static HashMap<Integer, Integer> getElementToFrequency(Integer[] elements) {
-        // build element's to frequency map
-        HashMap<Integer, Integer> elementToFrequency = new HashMap<Integer, Integer>();
-        int numberOfRepetitions;
-        for (Integer key : elements) {
-            if (elementToFrequency.get(key) == null) {
-                numberOfRepetitions = 0;
-                elementToFrequency.put(key, numberOfRepetitions);
-            }
-            numberOfRepetitions = elementToFrequency.get(key);
-            numberOfRepetitions++;
-            elementToFrequency.put(key, new Integer(numberOfRepetitions));
-        }
-        return elementToFrequency;
+    private static Map<Integer, Long> arrayToMapOfArrayElementOccurrenceFrequency(Integer[] elements) {
+        return Arrays.stream(elements).collect(Collectors.groupingBy(w -> w, Collectors.counting()));
     }
 }
