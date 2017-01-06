@@ -1,11 +1,10 @@
 package com.todun.utils.requirement.four;
 
 import com.todun.exceptions.InvalidInputException;
+import org.apache.commons.collections.bag.HashBag;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Write a function that takes an array of integers, and returns an array of integers.
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 class RequirementFour {
 
     /**
-     * Array of most common integers
+     * Array of most common integers. Empty array input gives empty array output.
      *
      * @param elements array of integers
      * @return array of most common integers
@@ -22,56 +21,53 @@ class RequirementFour {
      */
     static Integer[] mostCommonElements(Integer[] elements) throws InvalidInputException {
         if (elements == null) throw new InvalidInputException();
-
         if (elements.length == 0) return new Integer[]{};
 
+        HashBag bagOfElements = bagElements(elements);
+        int maxNumberOccurrence = getMaxNumberOccurrenceOfAnyElement(bagOfElements);
+        return listElementsWithMaximumOccurrence(bagOfElements, maxNumberOccurrence);
+    }
 
-        Map<Integer, Long> occurrences = arrayToMapOfArrayElementOccurrenceFrequency(elements);
-
-        Long maxOccurrence = getMaxOccurrence(occurrences);
-
-        List listOfMax = listMostCommonElements(occurrences, maxOccurrence);
-
-        return (Integer[]) listOfMax.toArray(new Integer[listOfMax.size()]);
+    /**
+     * Convert an array of elements into a {@link HashBag} of its elements as keys to frequency of occurrence as values
+     *
+     * @param elements array element
+     * @return {@link HashBag} of array element to frequency of occurrence
+     */
+    private static HashBag bagElements(Integer[] elements) {
+        HashBag bagOfElements = new HashBag();
+        List<Integer> elementCollection = Arrays.asList(elements);
+        bagOfElements.addAll(elementCollection);
+        return bagOfElements;
     }
 
     /**
      * Generates a distinct list of elements that are repeated the most
      *
-     * @param occurrences   map of element to the number of times it repeats
-     * @param maxOccurrence maximum number of times an element is repeated
+     * @param bagOfElements       {@link HashBag} of element to the number of times it repeats
+     * @param maxNumberOccurrence maximum number of times an element is repeated
      * @return list of most common elements
      */
-    private static List listMostCommonElements(Map<Integer, Long> occurrences, Long maxOccurrence) {
-        return occurrences
-                .entrySet()
+    private static Integer[] listElementsWithMaximumOccurrence(HashBag bagOfElements, int maxNumberOccurrence) {
+        Object[] result = bagOfElements
+                .uniqueSet()
                 .stream()
-                .filter(entry -> entry.getValue().equals(maxOccurrence))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .filter(element -> bagOfElements.getCount(element) == maxNumberOccurrence) // filter out elements that don't occur maximum number of times
+                .toArray();
+        return Arrays.copyOf(result, result.length, Integer[].class);
     }
 
     /**
      * Determines the maximum number of occurrence
      *
-     * @param occurrences map of element to the number of times it repeats
+     * @param bagOfElements {@link HashBag} of element to the number of times it repeats
      * @return maximum number of occurrence of an element
      */
-    private static Long getMaxOccurrence(Map<Integer, Long> occurrences) {
-        return occurrences.entrySet()
+    private static int getMaxNumberOccurrenceOfAnyElement(HashBag bagOfElements) {
+        return bagOfElements
                 .stream()
-                .max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1)
-                .get()
-                .getValue();
-    }
-
-    /**
-     * Convert an array of elements into a map of its elements as keys to frequency of occurrence as values
-     *
-     * @param elements array of elements
-     * @return map of array element to frequency of occurrence
-     */
-    private static Map<Integer, Long> arrayToMapOfArrayElementOccurrenceFrequency(Integer[] elements) {
-        return Arrays.stream(elements).collect(Collectors.groupingBy(w -> w, Collectors.counting()));
+                .mapToInt(s -> bagOfElements.getCount(s))
+                .max()
+                .getAsInt();
     }
 }
