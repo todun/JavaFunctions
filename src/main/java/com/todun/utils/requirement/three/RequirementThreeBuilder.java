@@ -1,65 +1,67 @@
 package com.todun.utils.requirement.three;
 
+import java.math.BigDecimal;
+
 /**
  * Builder for {@link RequirementThree}
  */
 public class RequirementThreeBuilder {
     /**
-     * {@link RequirementThree#base}
+     * {@link RequirementThree#sideA}
      */
-    private int base = 0;
+    private BigDecimal sideA = BigDecimal.ZERO;
 
     /**
-     * {@link RequirementThree#height}
+     * {@link RequirementThree#sideB}
      */
-    private int height = 0;
+    private BigDecimal sideB = BigDecimal.ZERO;
 
     /**
-     * {@link RequirementThree#hypotenuse}
+     * {@link RequirementThree#sideC}
      */
-    private int hypotenuse = 0;
+    private BigDecimal sideC = BigDecimal.ZERO;
 
     /**
-     * Create a {@link RequirementThreeBuilder} with a {@link #base}
+     * Create a {@link RequirementThreeBuilder} with a {@link #sideA}
      *
-     * @param base {@link #base}
-     * @return {@link RequirementThreeBuilder} with a {@link #base}
+     * @param sideA {@link #sideA}
+     * @return {@link RequirementThreeBuilder} with a {@link #sideA}
      */
-    public RequirementThreeBuilder setBase(int base) {
-        this.base = base;
+    public RequirementThreeBuilder setSideA(BigDecimal sideA) {
+        this.sideA = sideA;
         return this;
     }
 
     /**
-     * Create a {@link RequirementThreeBuilder} with a {@link #height}
+     * Create a {@link RequirementThreeBuilder} with a {@link #sideB}
      *
-     * @param height {@link #height}
-     * @return {@link RequirementThreeBuilder} with a {@link #height}
+     * @param sideB {@link #sideB}
+     * @return {@link RequirementThreeBuilder} with a {@link #sideB}
      */
-    public RequirementThreeBuilder setHeight(int height) {
-        this.height = height;
+    public RequirementThreeBuilder setSideB(BigDecimal sideB) {
+        this.sideB = sideB;
         return this;
     }
 
     /**
-     * Create a {@link RequirementThreeBuilder} with a {@link #hypotenuse}
+     * Create a {@link RequirementThreeBuilder} with a {@link #sideC}
      *
-     * @param hypotenuse {@link #hypotenuse}
-     * @return {@link RequirementThreeBuilder} with a {@link #hypotenuse}
+     * @param sideC {@link #sideC}
+     * @return {@link RequirementThreeBuilder} with a {@link #sideC}
      */
-    public RequirementThreeBuilder setHypotenuse(int hypotenuse) {
-        this.hypotenuse = hypotenuse;
+    public RequirementThreeBuilder setSideC(BigDecimal sideC) {
+        this.sideC = sideC;
         return this;
     }
 
     /**
      * Builds an instance of {@link RequirementThree}.
-     * To be used only after {@link RequirementThree}'s instance variables have been initialised {@link #base},
-     * {@link #height}, {@link #hypotenuse}
+     * To be used only after {@link RequirementThree}'s instance variables have been initialised {@link #sideA},
+     * {@link #sideB}, {@link #sideC}
      *
      * @return a built instance of {@link RequirementThree}
      */
     public RequirementThree build() {
-        return new RequirementThree(base, height, hypotenuse);
+        return new RequirementThree(sideA, sideB, sideC);
     }
 }

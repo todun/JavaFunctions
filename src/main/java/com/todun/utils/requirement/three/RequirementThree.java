@@ -2,6 +2,8 @@ package com.todun.utils.requirement.three;
 
 import com.todun.exceptions.InvalidTriangleException;
 
+import java.math.BigDecimal;
+
 /**
  * Write a function that takes three integer inputs and returns a single output.
  * The inputs are the lengths of the sides of a triangle.
@@ -9,19 +11,19 @@ import com.todun.exceptions.InvalidTriangleException;
  */
 public class RequirementThree {
     /**
-     * base length of right triangle
+     * sideA length of right triangle
      */
-    private int base;
+    private BigDecimal sideA;
 
     /**
-     * height length of right triangle
+     * sideB length of right triangle
      */
-    private int height;
+    private BigDecimal sideB;
 
     /**
-     * hypotenuse length of right triangle
+     * sideC length of right triangle
      */
-    private int hypotenuse;
+    private BigDecimal sideC;
 
     /**
      * Create instance of {@link RequirementThree}.
@@ -32,79 +34,81 @@ public class RequirementThree {
      * This ensures that only a builder like {@link RequirementThreeBuilder}
      * can create instances of {@link RequirementThree}
      *
-     * @param base       {@link #base}
-     * @param height     {@link #height}
-     * @param hypotenuse {@link #hypotenuse}
+     * @param sideA {@link #sideA}
+     * @param sideB {@link #sideB}
+     * @param sideC {@link #sideC}
      */
-    RequirementThree(int base, int height, int hypotenuse) {
-        this.base = base;
-        this.height = height;
-        this.hypotenuse = hypotenuse;
+    RequirementThree(BigDecimal sideA, BigDecimal sideB, BigDecimal sideC) {
+        this.sideA = sideA;
+        this.sideB = sideB;
+        this.sideC = sideC;
     }
 
     /**
-     * Input order assumes that the input is base, height, hypotenuse
+     * Input order assumes that the input is sideA, sideB, sideC
      *
      * @return area of triangle
      * @throws InvalidTriangleException if not a valid right triangle
      */
-    public int areaOfRightTriangle() throws InvalidTriangleException {
-        validateRightTriangle(this.base, this.height, this.hypotenuse);
+    public Double areaOfRightTriangle() throws InvalidTriangleException {
+        validateTriangle();
 
-        return calculateAreaOfRightTriangle(base, height);
-    }
-
-    /**
-     * Input order assumes that the input is base, height, hypotenuse
-     *
-     * @param base       base length of right triangle
-     * @param height     height of right triangle
-     * @param hypotenuse hypotenuse of right traingle
-     * @return area of triangle
-     * @throws InvalidTriangleException if not a valid right triangle
-     */
-    public static int areaOfRightTriangle(int base, int height, int hypotenuse) throws InvalidTriangleException {
-        validateRightTriangle(base, height, hypotenuse);
-
-        return calculateAreaOfRightTriangle(base, height);
+        return calculateAreaAnyTriangle();
     }
 
     /**
      * A right triangle cannot have negative length
-     * A valid right triangle hypotenuse squared must equal the sum of the base squared plus height squared
+     * A valid right triangle sideC squared must equal the sum of the sideA squared plus sideB squared
      *
-     * @param base       {@link #base}
-     * @param height     {@link #height}
-     * @param hypotenuse {@link #hypotenuse}
      * @throws InvalidTriangleException if not a valid right triangle
      */
-    private static void validateRightTriangle(int base, int height, int hypotenuse) throws InvalidTriangleException {
+    private void validateTriangle() throws InvalidTriangleException {
         // a right triangle cannot have negative length
-        if (base < 0 || height < 0 || hypotenuse < 0) throw new InvalidTriangleException();
-        // a valid right triangle hypotenuse squared must equal the sum of the base squared plus height squared
-        if (square(hypotenuse) != square(base) + square(height)) throw new InvalidTriangleException();
+        if (sideA.doubleValue() < 0 || sideB.doubleValue() < 0 || sideC.doubleValue() < 0)
+            throw new InvalidTriangleException();
+
+        // length of a side of a valid triangle cannot be greater than half of the triangle's perimeter
+        BigDecimal htp = perimeterOfHalfTriangle();
+        if (htp.subtract(sideA).doubleValue() < 0
+                || htp.subtract(sideB).doubleValue() < 0
+                || htp.subtract(sideC).doubleValue() < 0)
+            throw new InvalidTriangleException();
     }
 
     /**
      * Calculate the area of right triangle
      *
-     * @param base   {@link #base}
-     * @param height {@link #height}
      * @return area of right triangle
      */
-    private static int calculateAreaOfRightTriangle(int base, int height) {
-        return Math.floorDiv(base * height, 2);
+    private Double calculateAreaAnyTriangle() {
+        return triangleArea(perimeterOfHalfTriangle());
     }
 
     /**
-     * Compute the square of number
+     * {@link #perimeterOfHalfTriangle()}
      *
-     * @param num number to be squared
-     * @return square of number
-     * @throws ArithmeticException if the result overflows an int
-     * @since 1.8
+     * @param halfTrianglePerimeter {@link #perimeterOfHalfTriangle()}
+     * @return area of triangle
      */
-    private static int square(int num) throws ArithmeticException {
-        return Math.multiplyExact(num, num);
+    private Double triangleArea(BigDecimal halfTrianglePerimeter) {
+        return Math.sqrt(halfTrianglePerimeter
+                .subtract(sideA)
+                .multiply(halfTrianglePerimeter
+                        .subtract(sideB))
+                .multiply(halfTrianglePerimeter
+                        .subtract(sideC))
+                .multiply(halfTrianglePerimeter).doubleValue());
+    }
+
+    /**
+     * Helper method to calculate half of the triangle's perimeter
+     *
+     * @return half of the triangle's perimeter
+     */
+    private BigDecimal perimeterOfHalfTriangle() {
+        return sideA
+                .add(sideB)
+                .add(sideC)
+                .divide(BigDecimal.valueOf(2));
     }
 }
